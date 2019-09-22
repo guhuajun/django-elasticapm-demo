@@ -1,2 +1,2 @@
 # django-elasticapm-demo
-A project for testing django and elasticapm
+A demo project for testing django with apm

@@ -1,0 +1,47 @@
+version: "3"
+
+services: 
+  app:
+    image: greggu/djapmdemo:0.1
+    build: 
+      context: ./app/
+      dockerfile: Dockerfile
+    hostname: app
+    ports:
+      - 8000:8000
+    networks:
+      apmdemo:
+  elasticsearch:
+    image: elastic/elasticsearch:7.3.2
+    hostname: elasticsearch
+    ports:
+      - 9200:9200
+    networks:
+      apmdemo:
+    environment:
+      ES_JAVA_OPTS: "-Xms750m -Xmx750m"
+  kibana:
+    image: elastic/kibana:7.3.2
+    hostname: kibana
+    ports:
+      - 5601:5601
+    networks:
+      apmdemo:
+  apm:
+    image: elastic/apm-server:7.3.2
+    hostname: apm
+    user: apm-server
+    command: --strict.perms=false
+    environment:
+      - apm-server.host=0.0.0.0
+      - setup.kibana.host=kibana:5601
+      - output.elasticsearch.hosts=["elasticsearch:9200"]
+    volumes:
+      - ./apm/apm-server.docker.yml:/usr/share/apm-server/apm-server.yml:ro
+    ports:
+     - 8200:8200
+    networks:
+      apmdemo:
+
+networks:
+  apmdemo:
